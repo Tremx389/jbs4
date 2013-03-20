@@ -1,0 +1,34 @@
+<%= form_for @movie do |m| %>
+<center>
+  <table>
+    <td valign='middle' align='right'>
+      Title:
+    </td>
+    <td>
+      <%= m.text_field :title %>
+    </td>
+<tr>
+    <td valign='middle' align='right'>
+      Description:
+    </td>
+    <td>
+      <%= m.text_area :about %>
+    </td>
+<tr>
+    <td valign='middle' align='right'>
+      URL:
+    </td>
+    <td>
+     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
+    </td>
+<tr>
+    <td>
+    </td>
+    <td>
+      <center>
+        <%= m.submit %>
+      </center>
+    </td>
+  </table>
+</center>
+<% end %>

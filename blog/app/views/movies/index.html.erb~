@@ -1,0 +1,28 @@
+
+<center>
+  <div style='width: 700px;height: 500px; border: 1px; background: #f2f2f2'>
+    <h1 id='vT'>
+    </h1>
+<hr>
+    <video id='vP' width="400" height="300" style='margin-left: 20px;float: left' controls>
+    </video>
+  <div style='float:left; '>
+    <% @movies.each do |movie| %>
+      <div style='display: block; clear: both; float: left; font-size: 20px;cursor: pointer; color: #08c' onclick='loadVid(this)' id='<%= movie.url %>' title='<%= movie.about %>' >
+        <%= movie.title %>
+  <font style='font-size: 13px'><%= link_to "Edit", @movie %></font>
+      </div>
+    <% end %>
+  </div>
+<br>
+  <div id='vD' style='text-align: left;width: 100%; margin: 10px;float: left; clear: both;'>
+  </div>
+</center>
+<script>
+  function loadVid(video)
+    {
+      document.getElementById("vT").innerHTML = video.innerHTML;
+      document.getElementById("vD").innerHTML = video.title;
+      document.getElementById("vP").src = video.id;
+    }
+</script>
