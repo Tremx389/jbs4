@@ -12,7 +12,21 @@
       Description:
     </td>
     <td>
-      <%= m.text_area :about %>
+      <%= m.text_area :about, :size => "70%" %>
+    </td>
+    <td>
+
+      <% @actors.each do |actor| %>
+        <div style='clear: both;float: left'>
+          <% if @movActors.include?(actor.id.to_s) == true %>
+            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' CHECKED ><%= actor.name %>
+          <% else %>
+            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' ><%= actor.name %>
+          <% end %>
+        </div>
+      <% end %>
+<br>
+      <%= link_to "another Actor", "/lol"  %>
     </td>
 <tr>
     <td valign='middle' align='right'>
@@ -26,9 +40,35 @@
     </td>
     <td>
       <center>
-        <%= m.submit %> or <%= link_to "Delete", @movie, :confirm => "Are you sure?", :method => delete %>
+        <%= m.submit %> or <%= link_to "Delete", @movie, :confirm => "Are you sure?", :method => :delete %>
       </center>
     </td>
   </table>
 </center>
+		<%= m.hidden_field :actors, :id => "actors" %>
 <% end %>
+
+
+
+<script>
+  function detectActors()
+    {
+		var inputs = document.getElementsByTagName("input"); //or document.forms[0].elements;  
+		var cbs = []; //will contain all checkboxes  
+		var checked = []; //will contain all checked checkboxes  
+		for (var i = 0; i < inputs.length; i++) {  
+		  if (inputs[i].type == "checkbox") {  
+			 cbs.push(inputs[i]);  
+			 if (inputs[i].checked) {  
+				checked.push(inputs[i]);  
+			 }  
+		  }  
+		}
+			var string = "";
+      for (var i = 0; i < checked.length; i++)
+			{
+				string = string + " " +checked[i].id;
+			}
+      document.getElementById("actors").value = string;
+    }
+</script>

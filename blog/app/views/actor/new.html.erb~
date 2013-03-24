@@ -1,0 +1,7 @@
+<%= form_for(@actor) do |a| %>
+	<%= a.text_field :name %>
+
+	<%= a.date_select :birth %>
+
+	<%= a.submit %>
+<% end %>

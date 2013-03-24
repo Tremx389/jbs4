@@ -18,6 +18,13 @@ class MoviesController < ApplicationController
 
   def show
     @movie = Movie.find(params[:id])
+    @actors = Actors.all
+    if @movie.actors != nil
+
+      @movActors = @movie.actors.split
+    else
+      @movActors = ""
+    end
   end
 
   def update
@@ -35,4 +42,9 @@ class MoviesController < ApplicationController
     @movie.destroy
     redirect_to movie_path, :notice => "Your movie has been deleted"
   end
+
+  def newActor
+
+  end
+
 end
