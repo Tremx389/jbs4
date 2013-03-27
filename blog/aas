@@ -278,4 +278,1758 @@ index 0000000..7c36f23
 +
 +== Debugger
 +
-+Debugger support is avail
++Debugger support is available through the debugger command when you start your
++Mongrel or WEBrick server with --debugger. This means that you can break out of
++execution at any point in the code, investigate and change the model, and then,
++resume execution! You need to install ruby-debug to run the server in debugging
++mode. With gems, use <tt>sudo gem install ruby-debug</tt>. Example:
++
++  class WeblogController < ActionController::Base
++    def index
++      @posts = Post.all
++      debugger
++    end
++  end
++
++So the controller will accept the action, run the first line, then present you
++with a IRB prompt in the server window. Here you can do things like:
++
++  >> @posts.inspect
++  => "[#<Post:0x14a6be8
++          @attributes={"title"=>nil, "body"=>nil, "id"=>"1"}>,
++       #<Post:0x14a6620
++          @attributes={"title"=>"Rails", "body"=>"Only ten..", "id"=>"2"}>]"
++  >> @posts.first.title = "hello from a debugger"
++  => "hello from a debugger"
++
++...and even better, you can examine how your runtime objects actually work:
++
++  >> f = @posts.first
++  => #<Post:0x13630c4 @attributes={"title"=>nil, "body"=>nil, "id"=>"1"}>
++  >> f.
++  Display all 152 possibilities? (y or n)
++
++Finally, when you're ready to resume execution, you can enter "cont".
++
++
++== Console
++
++The console is a Ruby shell, which allows you to interact with your
++application's domain model. Here you'll have all parts of the application
++configured, just like it is when the application is running. You can inspect
++domain models, change values, and save to the database. Starting the script
++without arguments will launch it in the development environment.
++
++To start the console, run <tt>rails console</tt> from the application
++directory.
++
++Options:
++
++* Passing the <tt>-s, --sandbox</tt> argument will rollback any modifications
++  made to the database.
++* Passing an environment name as an argument will load the corresponding
++  environment. Example: <tt>rails console production</tt>.
++
++To reload your controllers and models after launching the console run
++<tt>reload!</tt>
++
++More information about irb can be found at:
++link:http://www.rubycentral.org/pickaxe/irb.html
++
++
++== dbconsole
++
++You can go to the command line of your database directly through <tt>rails
++dbconsole</tt>. You would be connected to the database with the credentials
++defined in database.yml. Starting the script without arguments will connect you
++to the development database. Passing an argument will connect you to a different
++database, like <tt>rails dbconsole production</tt>. Currently works for MySQL,
++PostgreSQL and SQLite 3.
++
++== Description of Contents
++
++The default directory structure of a generated Ruby on Rails application:
++
++  |-- app
++  |   |-- assets
++  |       |-- images
++  |       |-- javascripts
++  |       `-- stylesheets
++  |   |-- controllers
++  |   |-- helpers
++  |   |-- mailers
++  |   |-- models
++  |   `-- views
++  |       `-- layouts
++  |-- config
++  |   |-- environments
++  |   |-- initializers
++  |   `-- locales
++  |-- db
++  |-- doc
++  |-- lib
++  |   `-- tasks
++  |-- log
++  |-- public
++  |-- script
++  |-- test
++  |   |-- fixtures
++  |   |-- functional
++  |   |-- integration
++  |   |-- performance
++  |   `-- unit
++  |-- tmp
++  |   |-- cache
++  |   |-- pids
++  |   |-- sessions
++  |   `-- sockets
++  `-- vendor
++      |-- assets
++          `-- stylesheets
++      `-- plugins
++
++app
++  Holds all the code that's specific to this particular application.
++
++app/assets
++  Contains subdirectories for images, stylesheets, and JavaScript files.
++
++app/controllers
++  Holds controllers that should be named like weblogs_controller.rb for
++  automated URL mapping. All controllers should descend from
++  ApplicationController which itself descends from ActionController::Base.
++
++app/models
++  Holds models that should be named like post.rb. Models descend from
++  ActiveRecord::Base by default.
++
++app/views
++  Holds the template files for the view that should be named like
++  weblogs/index.html.erb for the WeblogsController#index action. All views use
++  eRuby syntax by default.
++
++app/views/layouts
++  Holds the template files for layouts to be used with views. This models the
++  common header/footer method of wrapping views. In your views, define a layout
++  using the <tt>layout :default</tt> and create a file named default.html.erb.
++  Inside default.html.erb, call <% yield %> to render the view using this
++  layout.
++
++app/helpers
++  Holds view helpers that should be named like weblogs_helper.rb. These are
++  generated for you automatically when using generators for controllers.
++  Helpers can be used to wrap functionality for your views into methods.
++
++config
++  Configuration files for the Rails environment, the routing map, the database,
++  and other dependencies.
++
++db
++  Contains the database schema in schema.rb. db/migrate contains all the
++  sequence of Migrations for your schema.
++
++doc
++  This directory is where your application documentation will be stored when
++  generated using <tt>rake doc:app</tt>
++
++lib
++  Application specific libraries. Basically, any kind of custom code that
++  doesn't belong under controllers, models, or helpers. This directory is in
++  the load path.
++
++public
++  The directory available for the web server. Also contains the dispatchers and the
++  default HTML files. This should be set as the DOCUMENT_ROOT of your web
++  server.
++
++script
++  Helper scripts for automation and generation.
++
++test
++  Unit and functional tests along with fixtures. When using the rails generate
++  command, template test files will be generated for you and placed in this
++  directory.
++
++vendor
++  External libraries that the application depends on. Also includes the plugins
++  subdirectory. If the app has frozen rails, those gems also go here, under
++  vendor/rails/. This directory is in the load path.
+diff --git a/Rakefile b/Rakefile
+new file mode 100644
+index 0000000..e1d1ec8
+--- /dev/null
++++ b/Rakefile
+@@ -0,0 +1,7 @@
++#!/usr/bin/env rake
++# Add your own tasks in files placed in lib/tasks ending in .rake,
++# for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
++
++require File.expand_path('../config/application', __FILE__)
++
++Blog::Application.load_tasks
+diff --git a/app/assets/images/rails.png b/app/assets/images/rails.png
+new file mode 100644
+index 0000000..d5edc04
+Binary files /dev/null and b/app/assets/images/rails.png differ
+diff --git a/app/assets/javascripts/actor.js.coffee b/app/assets/javascripts/actor.js.coffee
+new file mode 100644
+index 0000000..7615679
+--- /dev/null
++++ b/app/assets/javascripts/actor.js.coffee
+@@ -0,0 +1,3 @@
++# Place all the behaviors and hooks related to the matching controller here.
++# All this logic will automatically be available in application.js.
++# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
+diff --git a/app/assets/javascripts/application.js b/app/assets/javascripts/application.js
+new file mode 100644
+index 0000000..9097d83
+--- /dev/null
++++ b/app/assets/javascripts/application.js
+@@ -0,0 +1,15 @@
++// This is a manifest file that'll be compiled into application.js, which will include all the files
++// listed below.
++//
++// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
++// or vendor/assets/javascripts of plugins, if any, can be referenced here using a relative path.
++//
++// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
++// the compiled file.
++//
++// WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
++// GO AFTER THE REQUIRES BELOW.
++//
++//= require jquery
++//= require jquery_ujs
++//= require_tree .
+diff --git a/app/assets/javascripts/movies.js.coffee b/app/assets/javascripts/movies.js.coffee
+new file mode 100644
+index 0000000..7615679
+--- /dev/null
++++ b/app/assets/javascripts/movies.js.coffee
+@@ -0,0 +1,3 @@
++# Place all the behaviors and hooks related to the matching controller here.
++# All this logic will automatically be available in application.js.
++# You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
+diff --git a/app/assets/stylesheets/actor.css.scss b/app/assets/stylesheets/actor.css.scss
+new file mode 100644
+index 0000000..3068d3c
+--- /dev/null
++++ b/app/assets/stylesheets/actor.css.scss
+@@ -0,0 +1,3 @@
++// Place all the styles related to the actor controller here.
++// They will automatically be included in application.css.
++// You can use Sass (SCSS) here: http://sass-lang.com/
+diff --git a/app/assets/stylesheets/application.css b/app/assets/stylesheets/application.css
+new file mode 100644
+index 0000000..3192ec8
+--- /dev/null
++++ b/app/assets/stylesheets/application.css
+@@ -0,0 +1,13 @@
++/*
++ * This is a manifest file that'll be compiled into application.css, which will include all the files
++ * listed below.
++ *
++ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
++ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
++ *
++ * You're free to add application-wide styles to this file and they'll appear at the top of the
++ * compiled file, but it's generally better to create a new file per style scope.
++ *
++ *= require_self
++ *= require_tree .
++ */
+diff --git a/app/assets/stylesheets/movies.css.scss b/app/assets/stylesheets/movies.css.scss
+new file mode 100644
+index 0000000..70aaa8a
+--- /dev/null
++++ b/app/assets/stylesheets/movies.css.scss
+@@ -0,0 +1,3 @@
++// Place all the styles related to the movies controller here.
++// They will automatically be included in application.css.
++// You can use Sass (SCSS) here: http://sass-lang.com/
+diff --git a/app/controllers/actor_controller.rb b/app/controllers/actor_controller.rb
+new file mode 100644
+index 0000000..eed9907
+--- /dev/null
++++ b/app/controllers/actor_controller.rb
+@@ -0,0 +1,19 @@
++class ActorController < ApplicationController
++  def index
++  end
++  
++  def new
++    @actor = Actors.create
++  end
++  
++
++  def update
++
++    @actor = Movie.create(params[:actor])
++    if @actor.save
++      redirect_to actor_path, :notice => "Your movie was saved."
++    else
++      render "new"
++    end
++  end
++end
+diff --git a/app/controllers/actor_controller.rb~ b/app/controllers/actor_controller.rb~
+new file mode 100644
+index 0000000..660b24d
+--- /dev/null
++++ b/app/controllers/actor_controller.rb~
+@@ -0,0 +1,19 @@
++class ActorController < ApplicationController
++  def index
++  end
++  
++  def new
++    @actor = Actors.new
++  end
++  
++
++  def update
++
++    @actor = Movie.new(params[:actor])
++    if @actor.save
++      redirect_to actor_path, :notice => "Your movie was saved."
++    else
++      render "new"
++    end
++  end
++end
+diff --git a/app/controllers/application_controller.rb b/app/controllers/application_controller.rb
+new file mode 100644
+index 0000000..e8065d9
+--- /dev/null
++++ b/app/controllers/application_controller.rb
+@@ -0,0 +1,3 @@
++class ApplicationController < ActionController::Base
++  protect_from_forgery
++end
+diff --git a/app/controllers/movies_controller.rb b/app/controllers/movies_controller.rb
+new file mode 100644
+index 0000000..715e6fa
+--- /dev/null
++++ b/app/controllers/movies_controller.rb
+@@ -0,0 +1,50 @@
++class MoviesController < ApplicationController
++  def index
++    @movies = Movie.all
++  end
++  
++  def new
++    @movie = Movie.new
++  end
++  
++  def create
++    @movie = Movie.new(params[:movie])
++    if @movie.save
++      redirect_to movies_path, :notice => "Your movie was saved."
++    else
++      render "new"
++    end
++  end
++
++  def show
++    @movie = Movie.find(params[:id])
++    @actors = Actors.all
++    if @movie.actors != nil
++
++      @movActors = @movie.actors.split
++    else
++      @movActors = ""
++    end
++  end
++
++  def update
++    @mov = Movie.find(params[:id])
++    
++    if @mov.update_attributes(params[:movie])
++      redirect_to movies_path, :notice => "Your movie has been updated."
++    else
++      render "show"
++    end
++  end
++
++  def destroy
++    @movie = Movie.find(params[:id])
++    @movie.destroy
++    redirect_to movie_path, :notice => "Your movie has been deleted"
++  end
++
++  def newActor
++
++  end
++
++end
+diff --git a/app/controllers/movies_controller.rb~ b/app/controllers/movies_controller.rb~
+new file mode 100644
+index 0000000..045819e
+--- /dev/null
++++ b/app/controllers/movies_controller.rb~
+@@ -0,0 +1,49 @@
++class MoviesController < ApplicationController
++  def index
++    @movies = Movie.all
++  end
++  
++  def new
++    @movie = Movie.new
++  end
++  
++  def create
++    @movie = Movie.new(params[:movie])
++    if @movie.save
++      redirect_to movies_path, :notice => "Your movie was saved."
++    else
++      render "new"
++    end
++  end
++
++  def show
++    @movie = Movie.find(params[:id])
++    @actors = Actors.all
++    if @movie.actors != nil
++
++      @movActors = @movie.actors.split
++    else
++      @movActors = ""
++    end
++  end
++
++  def update
++    @mov = Movie.find(params[:id])
++    
++    if @mov.update_attributes(params[:movie])
++      redirect_to movies_path, :notice => "Your movie has been updated."
++    else
++      render "show"
++    end
++  end
++
++  def destroy
++    @movie = Movie.find(params[:id])
++    @movie.destroy
++    redirect_to movie_path, :notice => "Your movie has been deleted"
++  end
++
++  def newActor
++
++  end
++end
+diff --git a/app/helpers/actor_helper.rb b/app/helpers/actor_helper.rb
+new file mode 100644
+index 0000000..5001810
+--- /dev/null
++++ b/app/helpers/actor_helper.rb
+@@ -0,0 +1,2 @@
++module ActorHelper
++end
+diff --git a/app/helpers/application_helper.rb b/app/helpers/application_helper.rb
+new file mode 100644
+index 0000000..de6be79
+--- /dev/null
++++ b/app/helpers/application_helper.rb
+@@ -0,0 +1,2 @@
++module ApplicationHelper
++end
+diff --git a/app/helpers/movies_helper.rb b/app/helpers/movies_helper.rb
+new file mode 100644
+index 0000000..493eee5
+--- /dev/null
++++ b/app/helpers/movies_helper.rb
+@@ -0,0 +1,2 @@
++module MoviesHelper
++end
+diff --git a/app/mailers/.gitkeep b/app/mailers/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/app/models/.gitkeep b/app/models/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/app/models/actors.rb b/app/models/actors.rb
+new file mode 100644
+index 0000000..71f22cc
+--- /dev/null
++++ b/app/models/actors.rb
+@@ -0,0 +1,3 @@
++class Actors < ActiveRecord::Base
++  attr_accessible :birth, :name
++end
+diff --git a/app/models/movie.rb b/app/models/movie.rb
+new file mode 100644
+index 0000000..013d01f
+--- /dev/null
++++ b/app/models/movie.rb
+@@ -0,0 +1,3 @@
++class Movie < ActiveRecord::Base
++  attr_accessible :about, :title, :url, :actors
++end
+diff --git a/app/models/movie.rb~ b/app/models/movie.rb~
+new file mode 100644
+index 0000000..b625e3e
+--- /dev/null
++++ b/app/models/movie.rb~
+@@ -0,0 +1,3 @@
++class Movie < ActiveRecord::Base
++  attr_accessible :about, :title, :url
++end
+diff --git a/app/views/actor/index.html.erb b/app/views/actor/index.html.erb
+new file mode 100644
+index 0000000..f2e9a6e
+--- /dev/null
++++ b/app/views/actor/index.html.erb
+@@ -0,0 +1 @@
++Index Page of Actors
+diff --git a/app/views/actor/index.html.erb~ b/app/views/actor/index.html.erb~
+new file mode 100644
+index 0000000..6347189
+--- /dev/null
++++ b/app/views/actor/index.html.erb~
+@@ -0,0 +1 @@
++Index of Actors
+diff --git a/app/views/actor/new.html.erb b/app/views/actor/new.html.erb
+new file mode 100644
+index 0000000..02f9aab
+--- /dev/null
++++ b/app/views/actor/new.html.erb
+@@ -0,0 +1,7 @@
++<%= form_for(@actor) do |a| %>
++	<%= a.text_field :name %>
++
++	<%= a.text_field :birth %>
++
++	<%= a.submit %>
++<% end %>
+diff --git a/app/views/actor/new.html.erb~ b/app/views/actor/new.html.erb~
+new file mode 100644
+index 0000000..2d267b3
+--- /dev/null
++++ b/app/views/actor/new.html.erb~
+@@ -0,0 +1,7 @@
++<%= form_for(@actor) do |a| %>
++	<%= a.text_field :name %>
++
++	<%= a.date_select :birth %>
++
++	<%= a.submit %>
++<% end %>
+diff --git a/app/views/layouts/application.html.erb b/app/views/layouts/application.html.erb
+new file mode 100644
+index 0000000..be7b370
+--- /dev/null
++++ b/app/views/layouts/application.html.erb
+@@ -0,0 +1,30 @@
++<!DOCTYPE html>
++<html>
++<head>
++  <title>Blog</title>
++  <%= stylesheet_link_tag    "application", :media => "all" %>
++  <%= javascript_include_tag "application" %>
++  <%= csrf_meta_tags %>
++</head>
++<body>
++
++<center style='background-color: #f2f2f2;'>
++  <% flash.each do |key, value| %>
++    <%= value %>
++  <% end %>
++</center>
++
++
++<center>
++  <h1>
++    Movie Viewer
++  </h1>
++  <h3>
++    <%= link_to "Home", "/movies" %>  -  <%= link_to "Upload", new_movie_path %>
++  </h3>
++</center>
++
++<%= yield %>
++
++</body>
++</html>
+diff --git a/app/views/layouts/application.html.erb~ b/app/views/layouts/application.html.erb~
+new file mode 100644
+index 0000000..2e5961f
+--- /dev/null
++++ b/app/views/layouts/application.html.erb~
+@@ -0,0 +1,26 @@
++<!DOCTYPE html>
++<html>
++<head>
++  <title>Blog</title>
++  <%= stylesheet_link_tag    "application", :media => "all" %>
++  <%= javascript_include_tag "application" %>
++  <%= csrf_meta_tags %>
++</head>
++<body>
++
++<center style='background-color: #f2f2f2;'>
++  <% flash.each do |key, value| %>
++    <%= value %>
++  <% end %>
++  <h1>
++    Movie Viewer
++  </h1>
++  <h3>
++    <%= link_to "Home", "/movies" %>  -  <%= link_to "Upload", new_movie_path %>
++  </h3>
++</center>
++
++<%= yield %>
++
++</body>
++</html>
+diff --git a/app/views/movies/edit.html.erb~ b/app/views/movies/edit.html.erb~
+new file mode 100644
+index 0000000..e69de29
+diff --git a/app/views/movies/index.html.erb b/app/views/movies/index.html.erb
+new file mode 100644
+index 0000000..55addd6
+--- /dev/null
++++ b/app/views/movies/index.html.erb
+@@ -0,0 +1,28 @@
++
++<center>
++  <div style='width: 700px;height: 500px; border: 1px; background: #f2f2f2'>
++    <h1 id='vT'>
++    </h1>
++<hr>
++    <video id='vP' width="400" height="300" style='margin-left: 20px;float: left' controls>
++    </video>
++  <div style='float:left; '>
++    <% @movies.each do |movie| %>
++      <div style='display: block; clear: both; float: left; font-size: 20px;cursor: pointer; color: #08c' onclick='loadVid(this)' id='<%= movie.url %>' title='<%= movie.about %>' >
++        <%= movie.title %>
++  <font style='font-size: 13px'><%= link_to "Edit", movie %></font>
++      </div>
++    <% end %>
++  </div>
++<br>
++  <div id='vD' style='text-align: left;width: 100%; margin: 10px;float: left; clear: both;'>
++  </div>
++</center>
++<script>
++  function loadVid(video)
++    {
++      document.getElementById("vT").innerHTML = video.innerHTML;
++      document.getElementById("vD").innerHTML = video.title;
++      document.getElementById("vP").src = video.id;
++    }
++</script>
+diff --git a/app/views/movies/index.html.erb~ b/app/views/movies/index.html.erb~
+new file mode 100644
+index 0000000..e8186e8
+--- /dev/null
++++ b/app/views/movies/index.html.erb~
+@@ -0,0 +1,28 @@
++
++<center>
++  <div style='width: 700px;height: 500px; border: 1px; background: #f2f2f2'>
++    <h1 id='vT'>
++    </h1>
++<hr>
++    <video id='vP' width="400" height="300" style='margin-left: 20px;float: left' controls>
++    </video>
++  <div style='float:left; '>
++    <% @movies.each do |movie| %>
++      <div style='display: block; clear: both; float: left; font-size: 20px;cursor: pointer; color: #08c' onclick='loadVid(this)' id='<%= movie.url %>' title='<%= movie.about %>' >
++        <%= movie.title %>
++  <font style='font-size: 13px'><%= link_to "Edit", @movie %></font>
++      </div>
++    <% end %>
++  </div>
++<br>
++  <div id='vD' style='text-align: left;width: 100%; margin: 10px;float: left; clear: both;'>
++  </div>
++</center>
++<script>
++  function loadVid(video)
++    {
++      document.getElementById("vT").innerHTML = video.innerHTML;
++      document.getElementById("vD").innerHTML = video.title;
++      document.getElementById("vP").src = video.id;
++    }
++</script>
+diff --git a/app/views/movies/new.html.erb b/app/views/movies/new.html.erb
+new file mode 100644
+index 0000000..43eef3d
+--- /dev/null
++++ b/app/views/movies/new.html.erb
+@@ -0,0 +1,34 @@
++<%= form_for @movie do |m| %>
++<center>
++  <table>
++    <td valign='middle' align='right'>
++      Title:
++    </td>
++    <td>
++      <%= m.text_field :title %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      Description:
++    </td>
++    <td>
++      <%= m.text_area :about %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      URL:
++    </td>
++    <td>
++     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
++    </td>
++<tr>
++    <td>
++    </td>
++    <td>
++      <center>
++        <%= m.submit %>
++      </center>
++    </td>
++  </table>
++</center>
++<% end %>
+diff --git a/app/views/movies/new.html.erb~ b/app/views/movies/new.html.erb~
+new file mode 100644
+index 0000000..20c75bf
+--- /dev/null
++++ b/app/views/movies/new.html.erb~
+@@ -0,0 +1,35 @@
++<%= form_for @movie do |m| %>
++<center>
++  <table>
++    <td valign='middle' align='right'>
++      Title:
++    </td>
++    <td>
++      <%= m.text_field :title %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      Description:
++    </td>
++    <td>
++      <%= m.text_area :about %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      URL:
++    </td>
++    <td>
++     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
++    </td>
++<tr>
++    <td>
++    </td>
++    <td>
++      <center>
++        <%= m.submit %>
++      </center>
++    </td>
++  </table>
++</center>
++<br>
++<% end %>
+diff --git a/app/views/movies/newActor.html.erb~ b/app/views/movies/newActor.html.erb~
+new file mode 100644
+index 0000000..e69de29
+diff --git a/app/views/movies/show.html.erb b/app/views/movies/show.html.erb
+new file mode 100644
+index 0000000..146c576
+--- /dev/null
++++ b/app/views/movies/show.html.erb
+@@ -0,0 +1,74 @@
++<%= form_for @movie do |m| %>
++<center>
++  <table>
++    <td valign='middle' align='right'>
++      Title:
++    </td>
++    <td>
++      <%= m.text_field :title %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      Description:
++    </td>
++    <td>
++      <%= m.text_area :about, :size => "70%" %>
++    </td>
++    <td>
++
++      <% @actors.each do |actor| %>
++        <div style='clear: both;float: left'>
++          <% if @movActors.include?(actor.id.to_s) == true %>
++            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' CHECKED ><%= actor.name %>
++          <% else %>
++            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' ><%= actor.name %>
++          <% end %>
++        </div>
++      <% end %>
++<br>
++      <%= link_to "another Actor", "/actor/new"  %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      URL:
++    </td>
++    <td>
++     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
++    </td>
++<tr>
++    <td>
++    </td>
++    <td>
++      <center>
++        <%= m.submit %> or <%= link_to "Delete", @movie, :confirm => "Are you sure?", :method => :delete %>
++      </center>
++    </td>
++  </table>
++</center>
++		<%= m.hidden_field :actors, :id => "actors" %>
++<% end %>
++
++
++
++<script>
++  function detectActors()
++    {
++		var inputs = document.getElementsByTagName("input"); //or document.forms[0].elements;  
++		var cbs = []; //will contain all checkboxes  
++		var checked = []; //will contain all checked checkboxes  
++		for (var i = 0; i < inputs.length; i++) {  
++		  if (inputs[i].type == "checkbox") {  
++			 cbs.push(inputs[i]);  
++			 if (inputs[i].checked) {  
++				checked.push(inputs[i]);  
++			 }  
++		  }  
++		}
++			var string = "";
++      for (var i = 0; i < checked.length; i++)
++			{
++				string = string + " " +checked[i].id;
++			}
++      document.getElementById("actors").value = string;
++    }
++</script>
+diff --git a/app/views/movies/show.html.erb~ b/app/views/movies/show.html.erb~
+new file mode 100644
+index 0000000..d37b12b
+--- /dev/null
++++ b/app/views/movies/show.html.erb~
+@@ -0,0 +1,74 @@
++<%= form_for @movie do |m| %>
++<center>
++  <table>
++    <td valign='middle' align='right'>
++      Title:
++    </td>
++    <td>
++      <%= m.text_field :title %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      Description:
++    </td>
++    <td>
++      <%= m.text_area :about, :size => "70%" %>
++    </td>
++    <td>
++
++      <% @actors.each do |actor| %>
++        <div style='clear: both;float: left'>
++          <% if @movActors.include?(actor.id.to_s) == true %>
++            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' CHECKED ><%= actor.name %>
++          <% else %>
++            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' ><%= actor.name %>
++          <% end %>
++        </div>
++      <% end %>
++<br>
++      <%= link_to "another Actor", "/lol"  %>
++    </td>
++<tr>
++    <td valign='middle' align='right'>
++      URL:
++    </td>
++    <td>
++     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
++    </td>
++<tr>
++    <td>
++    </td>
++    <td>
++      <center>
++        <%= m.submit %> or <%= link_to "Delete", @movie, :confirm => "Are you sure?", :method => :delete %>
++      </center>
++    </td>
++  </table>
++</center>
++		<%= m.hidden_field :actors, :id => "actors" %>
++<% end %>
++
++
++
++<script>
++  function detectActors()
++    {
++		var inputs = document.getElementsByTagName("input"); //or document.forms[0].elements;  
++		var cbs = []; //will contain all checkboxes  
++		var checked = []; //will contain all checked checkboxes  
++		for (var i = 0; i < inputs.length; i++) {  
++		  if (inputs[i].type == "checkbox") {  
++			 cbs.push(inputs[i]);  
++			 if (inputs[i].checked) {  
++				checked.push(inputs[i]);  
++			 }  
++		  }  
++		}
++			var string = "";
++      for (var i = 0; i < checked.length; i++)
++			{
++				string = string + " " +checked[i].id;
++			}
++      document.getElementById("actors").value = string;
++    }
++</script>
+diff --git a/config.ru b/config.ru
+new file mode 100644
+index 0000000..ddf869e
+--- /dev/null
++++ b/config.ru
+@@ -0,0 +1,4 @@
++# This file is used by Rack-based servers to start the application.
++
++require ::File.expand_path('../config/environment',  __FILE__)
++run Blog::Application
+diff --git a/config/application.rb b/config/application.rb
+new file mode 100644
+index 0000000..470de5b
+--- /dev/null
++++ b/config/application.rb
+@@ -0,0 +1,62 @@
++require File.expand_path('../boot', __FILE__)
++
++require 'rails/all'
++
++if defined?(Bundler)
++  # If you precompile assets before deploying to production, use this line
++  Bundler.require(*Rails.groups(:assets => %w(development test)))
++  # If you want your assets lazily compiled in production, use this line
++  # Bundler.require(:default, :assets, Rails.env)
++end
++
++module Blog
++  class Application < Rails::Application
++    # Settings in config/environments/* take precedence over those specified here.
++    # Application configuration should go into files in config/initializers
++    # -- all .rb files in that directory are automatically loaded.
++
++    # Custom directories with classes and modules you want to be autoloadable.
++    # config.autoload_paths += %W(#{config.root}/extras)
++
++    # Only load the plugins named here, in the order given (default is alphabetical).
++    # :all can be used as a placeholder for all plugins not explicitly named.
++    # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
++
++    # Activate observers that should always be running.
++    # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
++
++    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
++    # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
++    # config.time_zone = 'Central Time (US & Canada)'
++
++    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
++    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
++    # config.i18n.default_locale = :de
++
++    # Configure the default encoding used in templates for Ruby 1.9.
++    config.encoding = "utf-8"
++
++    # Configure sensitive parameters which will be filtered from the log file.
++    config.filter_parameters += [:password]
++
++    # Enable escaping HTML in JSON.
++    config.active_support.escape_html_entities_in_json = true
++
++    # Use SQL instead of Active Record's schema dumper when creating the database.
++    # This is necessary if your schema can't be completely dumped by the schema dumper,
++    # like if you have constraints or database-specific column types
++    # config.active_record.schema_format = :sql
++
++    # Enforce whitelist mode for mass assignment.
++    # This will create an empty whitelist of attributes available for mass-assignment for all models
++    # in your app. As such, your models will need to explicitly whitelist or blacklist accessible
++    # parameters by using an attr_accessible or attr_protected declaration.
++    config.active_record.whitelist_attributes = true
++
++    # Enable the asset pipeline
++    config.assets.enabled = true
++
++    # Version of your assets, change this if you want to expire all your assets
++    config.assets.version = '1.0'
++  end
++end
+diff --git a/config/boot.rb b/config/boot.rb
+new file mode 100644
+index 0000000..4489e58
+--- /dev/null
++++ b/config/boot.rb
+@@ -0,0 +1,6 @@
++require 'rubygems'
++
++# Set up gems listed in the Gemfile.
++ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
++
++require 'bundler/setup' if File.exists?(ENV['BUNDLE_GEMFILE'])
+diff --git a/config/database.yml b/config/database.yml
+new file mode 100644
+index 0000000..51a4dd4
+--- /dev/null
++++ b/config/database.yml
+@@ -0,0 +1,25 @@
++# SQLite version 3.x
++#   gem install sqlite3
++#
++#   Ensure the SQLite 3 gem is defined in your Gemfile
++#   gem 'sqlite3'
++development:
++  adapter: sqlite3
++  database: db/development.sqlite3
++  pool: 5
++  timeout: 5000
++
++# Warning: The database defined as "test" will be erased and
++# re-generated from your development database when you run "rake".
++# Do not set this db to the same as development or production.
++test:
++  adapter: sqlite3
++  database: db/test.sqlite3
++  pool: 5
++  timeout: 5000
++
++production:
++  adapter: sqlite3
++  database: db/production.sqlite3
++  pool: 5
++  timeout: 5000
+diff --git a/config/environment.rb b/config/environment.rb
+new file mode 100644
+index 0000000..8f728b7
+--- /dev/null
++++ b/config/environment.rb
+@@ -0,0 +1,5 @@
++# Load the rails application
++require File.expand_path('../application', __FILE__)
++
++# Initialize the rails application
++Blog::Application.initialize!
+diff --git a/config/environments/development.rb b/config/environments/development.rb
+new file mode 100644
+index 0000000..7d775ca
+--- /dev/null
++++ b/config/environments/development.rb
+@@ -0,0 +1,37 @@
++Blog::Application.configure do
++  # Settings specified here will take precedence over those in config/application.rb
++
++  # In the development environment your application's code is reloaded on
++  # every request. This slows down response time but is perfect for development
++  # since you don't have to restart the web server when you make code changes.
++  config.cache_classes = false
++
++  # Log error messages when you accidentally call methods on nil.
++  config.whiny_nils = true
++
++  # Show full error reports and disable caching
++  config.consider_all_requests_local       = true
++  config.action_controller.perform_caching = false
++
++  # Don't care if the mailer can't send
++  config.action_mailer.raise_delivery_errors = false
++
++  # Print deprecation notices to the Rails logger
++  config.active_support.deprecation = :log
++
++  # Only use best-standards-support built into browsers
++  config.action_dispatch.best_standards_support = :builtin
++
++  # Raise exception on mass assignment protection for Active Record models
++  config.active_record.mass_assignment_sanitizer = :strict
++
++  # Log the query plan for queries taking more than this (works
++  # with SQLite, MySQL, and PostgreSQL)
++  config.active_record.auto_explain_threshold_in_seconds = 0.5
++
++  # Do not compress assets
++  config.assets.compress = false
++
++  # Expands the lines which load the assets
++  config.assets.debug = true
++end
+diff --git a/config/environments/production.rb b/config/environments/production.rb
+new file mode 100644
+index 0000000..b38f466
+--- /dev/null
++++ b/config/environments/production.rb
+@@ -0,0 +1,67 @@
++Blog::Application.configure do
++  # Settings specified here will take precedence over those in config/application.rb
++
++  # Code is not reloaded between requests
++  config.cache_classes = true
++
++  # Full error reports are disabled and caching is turned on
++  config.consider_all_requests_local       = false
++  config.action_controller.perform_caching = true
++
++  # Disable Rails's static asset server (Apache or nginx will already do this)
++  config.serve_static_assets = false
++
++  # Compress JavaScripts and CSS
++  config.assets.compress = true
++
++  # Don't fallback to assets pipeline if a precompiled asset is missed
++  config.assets.compile = false
++
++  # Generate digests for assets URLs
++  config.assets.digest = true
++
++  # Defaults to nil and saved in location specified by config.assets.prefix
++  # config.assets.manifest = YOUR_PATH
++
++  # Specifies the header that your server uses for sending files
++  # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
++  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
++
++  # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
++  # config.force_ssl = true
++
++  # See everything in the log (default is :info)
++  # config.log_level = :debug
++
++  # Prepend all log lines with the following tags
++  # config.log_tags = [ :subdomain, :uuid ]
++
++  # Use a different logger for distributed setups
++  # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
++
++  # Use a different cache store in production
++  # config.cache_store = :mem_cache_store
++
++  # Enable serving of images, stylesheets, and JavaScripts from an asset server
++  # config.action_controller.asset_host = "http://assets.example.com"
++
++  # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
++  # config.assets.precompile += %w( search.js )
++
++  # Disable delivery errors, bad email addresses will be ignored
++  # config.action_mailer.raise_delivery_errors = false
++
++  # Enable threaded mode
++  # config.threadsafe!
++
++  # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
++  # the I18n.default_locale when a translation can not be found)
++  config.i18n.fallbacks = true
++
++  # Send deprecation notices to registered listeners
++  config.active_support.deprecation = :notify
++
++  # Log the query plan for queries taking more than this (works
++  # with SQLite, MySQL, and PostgreSQL)
++  # config.active_record.auto_explain_threshold_in_seconds = 0.5
++end
+diff --git a/config/environments/test.rb b/config/environments/test.rb
+new file mode 100644
+index 0000000..89811cd
+--- /dev/null
++++ b/config/environments/test.rb
+@@ -0,0 +1,37 @@
++Blog::Application.configure do
++  # Settings specified here will take precedence over those in config/application.rb
++
++  # The test environment is used exclusively to run your application's
++  # test suite. You never need to work with it otherwise. Remember that
++  # your test database is "scratch space" for the test suite and is wiped
++  # and recreated between test runs. Don't rely on the data there!
++  config.cache_classes = true
++
++  # Configure static asset server for tests with Cache-Control for performance
++  config.serve_static_assets = true
++  config.static_cache_control = "public, max-age=3600"
++
++  # Log error messages when you accidentally call methods on nil
++  config.whiny_nils = true
++
++  # Show full error reports and disable caching
++  config.consider_all_requests_local       = true
++  config.action_controller.perform_caching = false
++
++  # Raise exceptions instead of rendering exception templates
++  config.action_dispatch.show_exceptions = false
++
++  # Disable request forgery protection in test environment
++  config.action_controller.allow_forgery_protection    = false
++
++  # Tell Action Mailer not to deliver emails to the real world.
++  # The :test delivery method accumulates sent emails in the
++  # ActionMailer::Base.deliveries array.
++  config.action_mailer.delivery_method = :test
++
++  # Raise exception on mass assignment protection for Active Record models
++  config.active_record.mass_assignment_sanitizer = :strict
++
++  # Print deprecation notices to the stderr
++  config.active_support.deprecation = :stderr
++end
+diff --git a/config/initializers/backtrace_silencers.rb b/config/initializers/backtrace_silencers.rb
+new file mode 100644
+index 0000000..59385cd
+--- /dev/null
++++ b/config/initializers/backtrace_silencers.rb
+@@ -0,0 +1,7 @@
++# Be sure to restart your server when you modify this file.
++
++# You can add backtrace silencers for libraries that you're using but don't wish to see in your backtraces.
++# Rails.backtrace_cleaner.add_silencer { |line| line =~ /my_noisy_library/ }
++
++# You can also remove all the silencers if you're trying to debug a problem that might stem from framework code.
++# Rails.backtrace_cleaner.remove_silencers!
+diff --git a/config/initializers/inflections.rb b/config/initializers/inflections.rb
+new file mode 100644
+index 0000000..5d8d9be
+--- /dev/null
++++ b/config/initializers/inflections.rb
+@@ -0,0 +1,15 @@
++# Be sure to restart your server when you modify this file.
++
++# Add new inflection rules using the following format
++# (all these examples are active by default):
++# ActiveSupport::Inflector.inflections do |inflect|
++#   inflect.plural /^(ox)$/i, '\1en'
++#   inflect.singular /^(ox)en/i, '\1'
++#   inflect.irregular 'person', 'people'
++#   inflect.uncountable %w( fish sheep )
++# end
++#
++# These inflection rules are supported but not enabled by default:
++# ActiveSupport::Inflector.inflections do |inflect|
++#   inflect.acronym 'RESTful'
++# end
+diff --git a/config/initializers/mime_types.rb b/config/initializers/mime_types.rb
+new file mode 100644
+index 0000000..72aca7e
+--- /dev/null
++++ b/config/initializers/mime_types.rb
+@@ -0,0 +1,5 @@
++# Be sure to restart your server when you modify this file.
++
++# Add new mime types for use in respond_to blocks:
++# Mime::Type.register "text/richtext", :rtf
++# Mime::Type.register_alias "text/html", :iphone
+diff --git a/config/initializers/secret_token.rb b/config/initializers/secret_token.rb
+new file mode 100644
+index 0000000..823f045
+--- /dev/null
++++ b/config/initializers/secret_token.rb
+@@ -0,0 +1,7 @@
++# Be sure to restart your server when you modify this file.
++
++# Your secret key for verifying the integrity of signed cookies.
++# If you change this key, all old signed cookies will become invalid!
++# Make sure the secret is at least 30 characters and all random,
++# no regular words or you'll be exposed to dictionary attacks.
++Blog::Application.config.secret_token = '997a6882e4411998480d001c3c403e2391d27bd7339a2fb6c1f2b899a1cc1e14c851e91d95a963af9d7c56250c30cf28cce3d5a7652d60d35a56eaec268b546b'
+diff --git a/config/initializers/session_store.rb b/config/initializers/session_store.rb
+new file mode 100644
+index 0000000..1a67af5
+--- /dev/null
++++ b/config/initializers/session_store.rb
+@@ -0,0 +1,8 @@
++# Be sure to restart your server when you modify this file.
++
++Blog::Application.config.session_store :cookie_store, key: '_blog_session'
++
++# Use the database for sessions instead of the cookie-based default,
++# which shouldn't be used to store highly confidential information
++# (create the session table with "rails generate session_migration")
++# Blog::Application.config.session_store :active_record_store
+diff --git a/config/initializers/wrap_parameters.rb b/config/initializers/wrap_parameters.rb
+new file mode 100644
+index 0000000..999df20
+--- /dev/null
++++ b/config/initializers/wrap_parameters.rb
+@@ -0,0 +1,14 @@
++# Be sure to restart your server when you modify this file.
++#
++# This file contains settings for ActionController::ParamsWrapper which
++# is enabled by default.
++
++# Enable parameter wrapping for JSON. You can disable this by setting :format to an empty array.
++ActiveSupport.on_load(:action_controller) do
++  wrap_parameters format: [:json]
++end
++
++# Disable root element in JSON by default.
++ActiveSupport.on_load(:active_record) do
++  self.include_root_in_json = false
++end
+diff --git a/config/locales/en.yml b/config/locales/en.yml
+new file mode 100644
+index 0000000..179c14c
+--- /dev/null
++++ b/config/locales/en.yml
+@@ -0,0 +1,5 @@
++# Sample localization file for English. Add more files in this directory for other locales.
++# See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
++
++en:
++  hello: "Hello world"
+diff --git a/config/routes.rb b/config/routes.rb
+new file mode 100644
+index 0000000..63d3e90
+--- /dev/null
++++ b/config/routes.rb
+@@ -0,0 +1,8 @@
++Blog::Application.routes.draw do
++  
++  resources :movies
++  resources :actor
++
++  match "/" => "movies#index"
++
++end
+diff --git a/config/routes.rb~ b/config/routes.rb~
+new file mode 100644
+index 0000000..f2d3957
+--- /dev/null
++++ b/config/routes.rb~
+@@ -0,0 +1,8 @@
++Blog::Application.routes.draw do
++  
++  resources :movies
++  resources :actors
++
++  match "/" => "movies#index"
++
++end
+diff --git a/db/migrate/20130318140312_create_movies.rb b/db/migrate/20130318140312_create_movies.rb
+new file mode 100644
+index 0000000..bf8fc20
+--- /dev/null
++++ b/db/migrate/20130318140312_create_movies.rb
+@@ -0,0 +1,12 @@
++class CreateMovies < ActiveRecord::Migration
++  def change
++    create_table :movies do |t|
++      t.string :title
++      t.text :about
++      t.string :url
++      t.text :actors
++
++      t.timestamps
++    end
++  end
++end
+diff --git a/db/migrate/20130318140312_create_movies.rb~ b/db/migrate/20130318140312_create_movies.rb~
+new file mode 100644
+index 0000000..bf8fc20
+--- /dev/null
++++ b/db/migrate/20130318140312_create_movies.rb~
+@@ -0,0 +1,12 @@
++class CreateMovies < ActiveRecord::Migration
++  def change
++    create_table :movies do |t|
++      t.string :title
++      t.text :about
++      t.string :url
++      t.text :actors
++
++      t.timestamps
++    end
++  end
++end
+diff --git a/db/migrate/20130323175716_create_actors.rb b/db/migrate/20130323175716_create_actors.rb
+new file mode 100644
+index 0000000..b5d7c30
+--- /dev/null
++++ b/db/migrate/20130323175716_create_actors.rb
+@@ -0,0 +1,10 @@
++class CreateActors < ActiveRecord::Migration
++  def change
++    create_table :actors do |t|
++      t.string :name
++      t.date :birth
++
++      t.timestamps
++    end
++  end
++end
+diff --git a/db/migrate/20130324125703_add_details_to_movie.rb b/db/migrate/20130324125703_add_details_to_movie.rb
+new file mode 100644
+index 0000000..229d8dd
+--- /dev/null
++++ b/db/migrate/20130324125703_add_details_to_movie.rb
+@@ -0,0 +1,5 @@
++class AddDetailsToMovie < ActiveRecord::Migration
++  def change
++    add_column :movies, :actors, :text
++  end
++end
+diff --git a/db/schema.rb b/db/schema.rb
+new file mode 100644
+index 0000000..802b0f4
+--- /dev/null
++++ b/db/schema.rb
+@@ -0,0 +1,32 @@
++# encoding: UTF-8
++# This file is auto-generated from the current state of the database. Instead
++# of editing this file, please use the migrations feature of Active Record to
++# incrementally modify your database, and then regenerate this schema definition.
++#
++# Note that this schema.rb definition is the authoritative source for your
++# database schema. If you need to create the application database on another
++# system, you should be using db:schema:load, not running all the migrations
++# from scratch. The latter is a flawed and unsustainable approach (the more migrations
++# you'll amass, the slower it'll run and the greater likelihood for issues).
++#
++# It's strongly recommended to check this file into your version control system.
++
++ActiveRecord::Schema.define(:version => 20130324125703) do
++
++  create_table "actors", :force => true do |t|
++    t.string   "name"
++    t.date     "birth"
++    t.datetime "created_at", :null => false
++    t.datetime "updated_at", :null => false
++  end
++
++  create_table "movies", :force => true do |t|
++    t.string   "title"
++    t.text     "about"
++    t.string   "url"
++    t.datetime "created_at", :null => false
++    t.datetime "updated_at", :null => false
++    t.text     "actors"
++  end
++
++end
+diff --git a/db/seeds.rb b/db/seeds.rb
+new file mode 100644
+index 0000000..4edb1e8
+--- /dev/null
++++ b/db/seeds.rb
+@@ -0,0 +1,7 @@
++# This file should contain all the record creation needed to seed the database with its default values.
++# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
++#
++# Examples:
++#
++#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
++#   Mayor.create(name: 'Emanuel', city: cities.first)
+diff --git a/doc/README_FOR_APP b/doc/README_FOR_APP
+new file mode 100644
+index 0000000..fe41f5c
+--- /dev/null
++++ b/doc/README_FOR_APP
+@@ -0,0 +1,2 @@
++Use this README file to introduce your application and point to useful places in the API for learning more.
++Run "rake doc:app" to generate API documentation for your models, controllers, helpers, and libraries.
+diff --git a/lib/assets/.gitkeep b/lib/assets/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/lib/tasks/.gitkeep b/lib/tasks/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/log/.gitkeep b/log/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/public/404.html b/public/404.html
+new file mode 100644
+index 0000000..9a48320
+--- /dev/null
++++ b/public/404.html
+@@ -0,0 +1,26 @@
++<!DOCTYPE html>
++<html>
++<head>
++  <title>The page you were looking for doesn't exist (404)</title>
++  <style type="text/css">
++    body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; }
++    div.dialog {
++      width: 25em;
++      padding: 0 4em;
++      margin: 4em auto 0 auto;
++      border: 1px solid #ccc;
++      border-right-color: #999;
++      border-bottom-color: #999;
++    }
++    h1 { font-size: 100%; color: #f00; line-height: 1.5em; }
++  </style>
++</head>
++
++<body>
++  <!-- This file lives in public/404.html -->
++  <div class="dialog">
++    <h1>The page you were looking for doesn't exist.</h1>
++    <p>You may have mistyped the address or the page may have moved.</p>
++  </div>
++</body>
++</html>
+diff --git a/public/422.html b/public/422.html
+new file mode 100644
+index 0000000..83660ab
+--- /dev/null
++++ b/public/422.html
+@@ -0,0 +1,26 @@
++<!DOCTYPE html>
++<html>
++<head>
++  <title>The change you wanted was rejected (422)</title>
++  <style type="text/css">
++    body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; }
++    div.dialog {
++      width: 25em;
++      padding: 0 4em;
++      margin: 4em auto 0 auto;
++      border: 1px solid #ccc;
++      border-right-color: #999;
++      border-bottom-color: #999;
++    }
++    h1 { font-size: 100%; color: #f00; line-height: 1.5em; }
++  </style>
++</head>
++
++<body>
++  <!-- This file lives in public/422.html -->
++  <div class="dialog">
++    <h1>The change you wanted was rejected.</h1>
++    <p>Maybe you tried to change something you didn't have access to.</p>
++  </div>
++</body>
++</html>
+diff --git a/public/500.html b/public/500.html
+new file mode 100644
+index 0000000..f3648a0
+--- /dev/null
++++ b/public/500.html
+@@ -0,0 +1,25 @@
++<!DOCTYPE html>
++<html>
++<head>
++  <title>We're sorry, but something went wrong (500)</title>
++  <style type="text/css">
++    body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; }
++    div.dialog {
++      width: 25em;
++      padding: 0 4em;
++      margin: 4em auto 0 auto;
++      border: 1px solid #ccc;
++      border-right-color: #999;
++      border-bottom-color: #999;
++    }
++    h1 { font-size: 100%; color: #f00; line-height: 1.5em; }
++  </style>
++</head>
++
++<body>
++  <!-- This file lives in public/500.html -->
++  <div class="dialog">
++    <h1>We're sorry, but something went wrong.</h1>
++  </div>
++</body>
++</html>
+diff --git a/public/favicon.ico b/public/favicon.ico
+new file mode 100644
+index 0000000..e69de29
+diff --git a/public/robots.txt b/public/robots.txt
+new file mode 100644
+index 0000000..085187f
+--- /dev/null
++++ b/public/robots.txt
+@@ -0,0 +1,5 @@
++# See http://www.robotstxt.org/wc/norobots.html for documentation on how to use the robots.txt file
++#
++# To ban all spiders from the entire site uncomment the next two lines:
++# User-Agent: *
++# Disallow: /
+diff --git a/script/rails b/script/rails
+new file mode 100755
+index 0000000..d76b181
+--- /dev/null
++++ b/script/rails
+@@ -0,0 +1,6 @@
++#!/usr/bin/env ruby1.9.1
++# This command will automatically be run when you run "rails" with Rails 3 gems installed from the root of your application.
++
++APP_PATH = File.expand_path('../../config/application',  __FILE__)
++require File.expand_path('../../config/boot',  __FILE__)
++require 'rails/commands'
+diff --git a/test/fixtures/.gitkeep b/test/fixtures/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/test/fixtures/actors.yml b/test/fixtures/actors.yml
+new file mode 100644
+index 0000000..99e0382
+--- /dev/null
++++ b/test/fixtures/actors.yml
+@@ -0,0 +1,9 @@
++# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
++
++one:
++  name: MyString
++  birth: 2013-03-23
++
++two:
++  name: MyString
++  birth: 2013-03-23
+diff --git a/test/fixtures/movies.yml b/test/fixtures/movies.yml
+new file mode 100644
+index 0000000..bea4da1
+--- /dev/null
++++ b/test/fixtures/movies.yml
+@@ -0,0 +1,11 @@
++# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
++
++one:
++  title: MyString
++  about: MyText
++  url: MyString
++
++two:
++  title: MyString
++  about: MyText
++  url: MyString
+diff --git a/test/functional/.gitkeep b/test/functional/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/test/functional/actor_controller_test.rb b/test/functional/actor_controller_test.rb
+new file mode 100644
+index 0000000..d30f5a5
+--- /dev/null
++++ b/test/functional/actor_controller_test.rb
+@@ -0,0 +1,7 @@
++require 'test_helper'
++
++class ActorControllerTest < ActionController::TestCase
++  # test "the truth" do
++  #   assert true
++  # end
++end
+diff --git a/test/functional/movies_controller_test.rb b/test/functional/movies_controller_test.rb
+new file mode 100644
+index 0000000..094edd7
+--- /dev/null
++++ b/test/functional/movies_controller_test.rb
+@@ -0,0 +1,7 @@
++require 'test_helper'
++
++class MoviesControllerTest < ActionController::TestCase
++  # test "the truth" do
++  #   assert true
++  # end
++end
+diff --git a/test/integration/.gitkeep b/test/integration/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/test/performance/browsing_test.rb b/test/performance/browsing_test.rb
+new file mode 100644
+index 0000000..3fea27b
+--- /dev/null
++++ b/test/performance/browsing_test.rb
+@@ -0,0 +1,12 @@
++require 'test_helper'
++require 'rails/performance_test_help'
++
++class BrowsingTest < ActionDispatch::PerformanceTest
++  # Refer to the documentation for all available options
++  # self.profile_options = { :runs => 5, :metrics => [:wall_time, :memory]
++  #                          :output => 'tmp/performance', :formats => [:flat] }
++
++  def test_homepage
++    get '/'
++  end
++end
+diff --git a/test/test_helper.rb b/test/test_helper.rb
+new file mode 100644
+index 0000000..8bf1192
+--- /dev/null
++++ b/test/test_helper.rb
+@@ -0,0 +1,13 @@
++ENV["RAILS_ENV"] = "test"
++require File.expand_path('../../config/environment', __FILE__)
++require 'rails/test_help'
++
++class ActiveSupport::TestCase
++  # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
++  #
++  # Note: You'll currently still have to declare fixtures explicitly in integration tests
++  # -- they do not yet inherit this setting
++  fixtures :all
++
++  # Add more helper methods to be used by all tests here...
++end
+diff --git a/test/unit/.gitkeep b/test/unit/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/test/unit/actors_test.rb b/test/unit/actors_test.rb
+new file mode 100644
+index 0000000..aaf7251
+--- /dev/null
++++ b/test/unit/actors_test.rb
+@@ -0,0 +1,7 @@
++require 'test_helper'
++
++class ActorsTest < ActiveSupport::TestCase
++  # test "the truth" do
++  #   assert true
++  # end
++end
+diff --git a/test/unit/helpers/actor_helper_test.rb b/test/unit/helpers/actor_helper_test.rb
+new file mode 100644
+index 0000000..1b787a3
+--- /dev/null
++++ b/test/unit/helpers/actor_helper_test.rb
+@@ -0,0 +1,4 @@
++require 'test_helper'
++
++class ActorHelperTest < ActionView::TestCase
++end
+diff --git a/test/unit/helpers/movies_helper_test.rb b/test/unit/helpers/movies_helper_test.rb
+new file mode 100644
+index 0000000..c72b84c
+--- /dev/null
++++ b/test/unit/helpers/movies_helper_test.rb
+@@ -0,0 +1,4 @@
++require 'test_helper'
++
++class MoviesHelperTest < ActionView::TestCase
++end
+diff --git a/test/unit/movie_test.rb b/test/unit/movie_test.rb
+new file mode 100644
+index 0000000..22d7084
+--- /dev/null
++++ b/test/unit/movie_test.rb
+@@ -0,0 +1,7 @@
++require 'test_helper'
++
++class MovieTest < ActiveSupport::TestCase
++  # test "the truth" do
++  #   assert true
++  # end
++end
+diff --git a/vendor/assets/javascripts/.gitkeep b/vendor/assets/javascripts/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/vendor/assets/stylesheets/.gitkeep b/vendor/assets/stylesheets/.gitkeep
+new file mode 100644
+index 0000000..e69de29
+diff --git a/vendor/plugins/.gitkeep b/vendor/plugins/.gitkeep
+new file mode 100644
+index 0000000..e69de29
