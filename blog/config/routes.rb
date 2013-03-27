@@ -4,5 +4,4 @@ Blog::Application.routes.draw do
   resources :actors
 
   match "/" => "movies#index"
-
 end

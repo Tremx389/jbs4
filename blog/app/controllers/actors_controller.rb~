@@ -9,7 +9,7 @@
     def create
       @actor = Actor.create(params[:actor]) # Here also the Actor class name should be singular
         if @actor.save
-          redirect_to actor_path, :notice => "Your actor was saved."
+          redirect_to movie_path, :notice => "Your actor was saved."
         else
           render "new"
         end

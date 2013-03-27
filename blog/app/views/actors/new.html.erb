@@ -1,7 +1,9 @@
 <%= form_for(@actor) do |a| %>
-	<%= a.text_field :name %>
-
-	<%= a.text_field :birth %>
-
-	<%= a.submit %>
+	<center>
+		Name: <%= a.text_field :name %>
+<br />
+		Birth Day: <%= a.date_select :birth %>
+<br />
+		<%= a.submit %>
+	</center>
 <% end %>

@@ -18,7 +18,7 @@ class MoviesController < ApplicationController
 
   def show
     @movie = Movie.find(params[:id])
-    @actors = Actors.all
+    @actors = Actor.all
     if @movie.actors != nil
 
       @movActors = @movie.actors.split
@@ -41,10 +41,6 @@ class MoviesController < ApplicationController
     @movie = Movie.find(params[:id])
     @movie.destroy
     redirect_to movie_path, :notice => "Your movie has been deleted"
-  end
-
-  def newActor
-
   end
 
 end
