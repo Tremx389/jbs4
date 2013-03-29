@@ -1,0 +1,10 @@
+class CreateConnects < ActiveRecord::Migration
+  def change
+    create_table :connects do |t|
+      t.integer :artist_id
+      t.integer :film_id
+
+      t.timestamps
+    end
+  end
+end

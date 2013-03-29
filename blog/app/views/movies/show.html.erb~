@@ -1,61 +1,88 @@
 <%= form_for @movie do |m| %>
 <center>
-  <table>
+  <table style="margin-top: 30px;width: 80%;color: #555; font-family: Lucida Grande, Helvetica, Arial; font-size: 13px; text-shadow: 0 0 3px rgba(0,0,0,0.1);">
     <td valign='middle' align='right'>
       Title:
     </td>
-    <td>
-      <%= m.text_field :title %>
+    <td style="width:100%">
+      <input id="movie_title" value="<%= @movie.title %>" name="movie[title]" style="border-radius: 2px; width:100.7%; height: 30px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);" type="text">
     </td>
 <tr>
     <td valign='middle' align='right'>
       Description:
     </td>
     <td>
-      <%= m.text_area :about, :size => "70%" %>
-    </td>
-    <td>
-
-      <% @actors.each do |actor| %>
-        <div style='clear: both;float: left'>
-          <% if @movActors.include?(actor.id.to_s) == true %>
-            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' CHECKED ><%= actor.name %>
-          <% else %>
-            <input id='<%= actor.id %>' onclick='detectActors()' type='checkbox' ><%= actor.name %>
-          <% end %>
-        </div>
-      <% end %>
-<br>
-      <%= link_to "another Actor", "/actor/new"  %>
+      <textarea id="movie_about" name="movie[about]" style="border-radius: 2px; width:100%; height: 300px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);"><%= @movie.about %></textarea>
     </td>
 <tr>
     <td valign='middle' align='right'>
       URL:
     </td>
     <td>
-     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
+    <input value="<%= @movie.url %>" id="url" name="movie[url]" size="30" style="border-radius: 2px; width:100.7%; height: 30px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);" type="text"><input type='file' onchange="document.getElementById('url').value = this.value" style="margin-top: 5px; margin-left: 0px;" />
     </td>
 <tr>
-    <td>
+    <td colspan="2" >
+    <br>
+    	<center>
+      	<div style="background: rgba(0,0,0,0.05);box-shadow: 0 0 12px rgba(0,0,0,0.5); height: 1px;width: 100%; width: 200px;">
+     	 	</div>
+     	 </center>
+    <br>
+      		<% @actors.each do |actor| %>
+      			
+      			
+      			<% if @i % 3 == 0 %>
+      			
+      				<div style="width: 100px; border-right: 1px dashed rgba(0,0,0,0.3); float: left; ">
+      			<% end %>
+      			
+      			<div style="float: left">
+      				<% if @relats.include?(actor.id) == true %>
+      					<input id="<%= actor.id %>" onclick="detectActors()" type="checkbox" CHECKED /><% else %>
+      				      				<input id="<%= actor.id %>" onclick="detectActors()" type="checkbox" /><% end %><%= actor.name %>
+      			</div>
+      			
+      			<% if @i % 3 == 2 %>
+      				</div>
+      			<% end %>
+      			
+      			<% @i+=1 %>
+      		<% end %>
+      		</div>
+      		<a href="/../actors/new">
+      			<div id="addBtn2" style="margin-top: 13px;margin-left: 30px;float: left; padding-top: 4px;padding-bottom: 7px;padding-left: 9px;">
+      				<b>
+      					+
+      				</b>
+      			</div>
+      		</a>
     </td>
-    <td>
-      <center>
-        <%= m.submit %> or <%= link_to "Delete", @movie, :confirm => "Are you sure?", :method => :delete %>
-      </center>
-    </td>
+<tr>
+	 <td colspan="2">
+	 
+	 </td>
   </table>
 </center>
-		<%= m.hidden_field :actors, :id => "actors" %>
+<br>
+      <center style="display: inline; ">
+      	<div style="width: 200px;">
+   	 		<input id="rel" name="movie[rel]" style="display: none" />
+   	 		<input name="commit" type="submit" value="Update Movie" style="float: left;">
+     		  	
 <% end %>
-
-
+<%= form_for @movie do |m| %>
+	<input name="_method" type="hidden" value="delete"><input type="submit" value="Delete" style="float: left;">
+<% end %>
+     		</div>
+      </center>
 
 <script>
   function detectActors()
     {
-		var inputs = document.getElementsByTagName("input"); //or document.forms[0].elements;  
-		var cbs = []; //will contain all checkboxes  
-		var checked = []; //will contain all checked checkboxes  
+		var inputs = document.getElementsByTagName("input");
+		var cbs = [];  
+		var checked = [];  
 		for (var i = 0; i < inputs.length; i++) {  
 		  if (inputs[i].type == "checkbox") {  
 			 cbs.push(inputs[i]);  
@@ -69,6 +96,6 @@
 			{
 				string = string + " " +checked[i].id;
 			}
-      document.getElementById("actors").value = string;
+      document.getElementById("rel").value = string;
     }
 </script>

@@ -1,0 +1,35 @@
+
+
+
+
+  <div style='margin: 0px;width: 700px;height: 500px; border: 1px; background: #f2f2f2'>
+<hr>
+
+  <div style='float:left; '>
+    <% @movies.each do |movie| %>
+      <div style='display: block; clear: both; float: left; font-size: 20px;cursor: pointer; color: #08c' onclick='loadVid(this)' id='<%= movie.url %>' title='<%= movie.about %>' >
+        <%= movie.title %>
+  <img src="http://upload.wikimedia.org/wikipedia/commons/e/ec/Btn_edit.gif" height="15px" /><%= link_to "Edit", movie %></font>
+      </div>
+    <% end %>
+  </div>
+<br>
+  <div id='vD' style='text-align: left;width: 100%; margin: 10px;float: left; clear: both;'>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+<script>
+  function loadVid(video)
+    {
+      document.getElementById("title").innerHTML = video.innerHTML;
+      document.getElementById("vD").innerHTML = video.title;
+      document.getElementById("vP").src = video.id;
+    }
+</script>

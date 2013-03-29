@@ -1,34 +1,92 @@
 <%= form_for @movie do |m| %>
 <center>
-  <table>
+  <table style="margin-top: 30px;width: 80%;color: #555; font-family: Lucida Grande, Helvetica, Arial; font-size: 13px; text-shadow: 0 0 3px rgba(0,0,0,0.1);">
     <td valign='middle' align='right'>
       Title:
     </td>
-    <td>
-      <%= m.text_field :title %>
+    <td style="width:100%">
+      <input id="movie_title" name="movie[title]" style="border-radius: 2px; width:100.7%; height: 30px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);" type="text">
     </td>
 <tr>
     <td valign='middle' align='right'>
       Description:
     </td>
     <td>
-      <%= m.text_area :about %>
+      <textarea id="movie_about" name="movie[about]" style="border-radius: 2px; width:100%; height: 300px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);">
+      </textarea>
     </td>
 <tr>
     <td valign='middle' align='right'>
       URL:
     </td>
     <td>
-     <%= m.text_field :url, :id => "url" %><input type='file' onchange="document.getElementById('url').value = this.value" />
+    <input id="url" name="movie[url]" size="30" style="border-radius: 2px; width:100.7%; height: 30px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);" type="text"><input type='file' onchange="document.getElementById('url').value = this.value" style="margin-top: 5px; margin-left: 0px;" />
     </td>
 <tr>
-    <td>
+    <td colspan="2" >
+    <br>
+    	<center>
+      	<div style="background: rgba(0,0,0,0.05);box-shadow: 0 0 12px rgba(0,0,0,0.5); height: 1px;width: 100%; width: 200px;">
+     	 	</div>
+     	 </center>
+    <br>
+      		<% @actors.each do |actor| %>
+      			
+      			
+      			<% if @i % 3 == 0 %>
+      			
+      				<div style="width: 100px; border-right: 1px dashed rgba(0,0,0,0.3); float: left; ">
+      			<% end %>
+      			
+      			<div style="float: left"><input id="<%= actor.id %>" onclick="detectActors()" type="checkbox" /><%= actor.name %> </div>
+      			
+      			<% if @i % 3 == 2 %>
+      				</div>
+      			<% end %>
+      			
+      			<% @i+=1 %>
+      		<% end %>
+      		</div>
+      		<a href="../actors/new">
+      			<div id="addBtn2" style="margin-top: 13px;margin-left: 30px;float: left; padding-top: 4px;padding-bottom: 7px;padding-left: 9px;">
+      				<b>
+      					+
+      				</b>
+      			</div>
+      		</a>
     </td>
-    <td>
+<tr>
+	 <td colspan="2">
+	 <br>
       <center>
-        <%= m.submit %>
+       <input id="rel" name="movie[rel]" style="display: none" /> <%= m.submit %>
       </center>
-    </td>
+	 </td>
   </table>
 </center>
 <% end %>
+
+
+
+<script>
+  function detectActors()
+    {
+		var inputs = document.getElementsByTagName("input");
+		var cbs = [];  
+		var checked = [];  
+		for (var i = 0; i < inputs.length; i++) {  
+		  if (inputs[i].type == "checkbox") {  
+			 cbs.push(inputs[i]);  
+			 if (inputs[i].checked) {  
+				checked.push(inputs[i]);  
+			 }  
+		  }  
+		}
+			var string = "";
+      for (var i = 0; i < checked.length; i++)
+			{
+				string = string + " " +checked[i].id;
+			}
+      document.getElementById("rel").value = string;
+    }
+</script>

@@ -1,26 +1,59 @@
 class MoviesController < ApplicationController
   def index
     @movies = Movie.all
+    @title = "Home"
+    @i = 0;
+    
+    
+    @relat = Array.new
+    @movies.each do |m|
+    	@first = Relationships.where(:film_id => m.id).collect(&:actor_id);
+    	@relat[m.id] = ""
+    	
+    	@first.each do |f|
+    		@actor = Actor.find(f)[:name].to_s
+  		  	@relat[m.id] = @actor + "," + @relat[m.id];
+    	end
+    end
   end
   
   def new
+  	 @i = 0
     @movie = Movie.new
+    @rel = Relationships.new
+    
+    @actors = Actor.all
+    
+    @title = "Upload"
   end
   
   def create
-    @movie = Movie.new(params[:movie])
+    @par = params[:movie]
+    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url])
+    @relations = @par[:rel].split
+    
     if @movie.save
-      redirect_to movies_path, :notice => "Your movie was saved."
+    	@relations.each do |relation|
+    		@addRel = Relationships.new(:actor_id => relation ,:film_id => @movie.id)
+    		@addRel.save
+    	end
+     	redirect_to movies_path, :notice => "Saved!"
+     	
     else
       render "new"
     end
   end
 
   def show
+  	@i = 0;
+  	 @title = "Edit("+params[:id]+")"
+    
     @movie = Movie.find(params[:id])
     @actors = Actor.all
+    
+    @relats = Relationships.where(:film_id => params[:id]).collect(&:actor_id);
+    
     if @movie.actors != nil
-
       @movActors = @movie.actors.split
     else
       @movActors = ""
@@ -29,9 +62,20 @@ class MoviesController < ApplicationController
 
   def update
     @mov = Movie.find(params[:id])
+    @par = params[:movie]
     
-    if @mov.update_attributes(params[:movie])
-      redirect_to movies_path, :notice => "Your movie has been updated."
+    @relations = @par[:rel].split
+    
+    @destroy = Relationships.where(:film_id => params[:id]).destroy_all
+    
+    @relations.each do |relation|
+    		@addRel = Relationships.new(:actor_id => relation ,:film_id => params[:id])
+    		@addRel.save
+    	end
+    
+    
+    if @mov.update_attributes(:about => @par[:about], :title => @par[:title], :url => @par[:url])
+      redirect_to movies_path, :notice => "Updated!"
     else
       render "show"
     end
@@ -40,7 +84,9 @@ class MoviesController < ApplicationController
   def destroy
     @movie = Movie.find(params[:id])
     @movie.destroy
-    redirect_to movie_path, :notice => "Your movie has been deleted"
+    @destroy = Relationships.where(:film_id => params[:id]).destroy_all
+    
+    redirect_to movies_path, :notice => "Deleted"
   end
 
 end

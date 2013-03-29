@@ -1,9 +1,33 @@
 <%= form_for(@actor) do |a| %>
-	<center>
-		Name: <%= a.text_field :name %>
-<br />
-		Birth Day: <%= a.date_select :birth %>
-<br />
-		<%= a.submit %>
-	</center>
+<center>
+  <table style="margin-top: 30px;width: 80%;color: #555; font-family: Lucida Grande, Helvetica, Arial; font-size: 13px; text-shadow: 0 0 3px rgba(0,0,0,0.1);">
+    <td valign='middle' align='right'>
+      Name:
+    </td>
+    <td style="width:100%">
+      <input id="actor_name" name="actor[name]" style="font-size: 17px;border-radius: 2px; width:100.7%; height: 30px; border: 1px solid rgba(0,0,0,0.2); box-shadow: inset 0 0 30px rgba(0,0,0,0.15);" type="text">
+    </td>
+<tr>
+    <td valign='middle' align='right'>
+      Birth:
+    </td>
+    <td>
+    	<center>
+    		<%= a.date_select :birth %>
+    	</center>
+    </td>
+<tr>
+	<td colspan="2">
+	<br>
+		<center>
+			<%= a.submit %>
+		</center>
+	</td>
+  </table>
+</center>
+
 <% end %>
+	<script>
+		document.getElementById("datas").style.height = "160px";
+		document.getElementById("datas").style.marginTop = "-80px";
+	</script>

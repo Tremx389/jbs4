@@ -1,28 +1,73 @@
 
-<center>
-  <div style='width: 700px;height: 500px; border: 1px; background: #f2f2f2'>
-    <h1 id='vT'>
-    </h1>
-<hr>
-    <video id='vP' width="400" height="300" style='margin-left: 20px;float: left' controls>
-    </video>
-  <div style='float:left; '>
-    <% @movies.each do |movie| %>
-      <div style='display: block; clear: both; float: left; font-size: 20px;cursor: pointer; color: #08c' onclick='loadVid(this)' id='<%= movie.url %>' title='<%= movie.about %>' >
-        <%= movie.title %>
-  <font style='font-size: 13px'><%= link_to "Edit", @movie %></font>
-      </div>
-    <% end %>
-  </div>
-<br>
-  <div id='vD' style='text-align: left;width: 100%; margin: 10px;float: left; clear: both;'>
-  </div>
-</center>
+
+
+   <video id='vP' width="400" height="300" controls>
+   </video>
+	<div id="playList">
+		<% @movies.each do |movie| %>
+			<% @i+=1 %>
+			<% if @i % 2 == 0 %>
+				<div actors="<%= @relat[movie.id] %>" name="<%= movie.id %>" style="background-image: -webkit-linear-gradient(top,#585858,#3f3f3f);" class="movieList" onclick='loadVid(this)' id="<%= movie.url %>" title="<%= movie.about %>" > 
+			<% else %>
+			 	<div actors="<%= @relat[movie.id] %>" name="<%= movie.id %>" style="background-image: -webkit-linear-gradient(top,#444,#2a2a2a);" class="movieList" onclick='loadVid(this)' id="<%= movie.url %>" title="<%= movie.about %>" >
+			<% end %>
+		     <%= movie.title %>
+		   </div>
+		 <% end %>
+			<center>
+				<a href="movies/new">
+					<div id="addBtn2">
+						<b>
+							+
+						</b>
+					</div>
+				</a>
+			</center>
+	</div>
+  
+  	<div id="details">
+  		<div id="actors">
+  			<a id="editHREF">
+  				<div id="editBtn">
+  					Edit
+  				</div>
+  			</a>
+  			<div id="actorsList">
+	  			<div class="actor">
+	  				Seagul
+	  			</div>
+	  			<div class="actor">
+	  				Fish
+	  			</div>
+  			</div>
+  		</div>
+  		<div id="description">
+  		</div>
+  	</div>
+  
+  
+  
+  
+  
+  
 <script>
   function loadVid(video)
     {
-      document.getElementById("vT").innerHTML = video.innerHTML;
-      document.getElementById("vD").innerHTML = video.title;
-      document.getElementById("vP").src = video.id;
+    	document.getElementById("actorsList").innerHTML = "";
+    	var actors = video.attributes["actors"].value.split(",")
+    	for (var i = 0; i < actors.length-1; i++)
+    		{
+    			$("#actorsList").append("<div class='actor'>"+actors[i]+"</div>");
+    		}
+    		
+    	document.getElementById("editHREF").href = "/movies/"+video.attributes["name"].value+"/";
+    	var vid =  document.getElementById("vP");
+     	document.title = "moViews - " + video.innerHTML;
+      document.getElementById("title").innerHTML = video.innerHTML;
+      document.getElementById("description").innerHTML = video.title;
+     	vid.src = video.id;
+     	vid.style.backgroundImage = "none";
+     	vid.style.backgroundColor = "black";
+     	document.getElementById("editBtn").style.cursor = "pointer";
     }
 </script>

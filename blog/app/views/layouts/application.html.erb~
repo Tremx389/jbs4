@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Blog</title>
-  <%= stylesheet_link_tag    "application", :media => "all" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+	<head>
+	  <title>moViews</title>
+	  <%= stylesheet_link_tag    "application", :media => "all" %>
+	  <%= stylesheet_link_tag    "movies", :media => "all" %>
+	  
+	  <%= javascript_include_tag "application" %>
+	  <%= csrf_meta_tags %>
+	</head>
+	<body style="background: #f9f9f9; margin: 0px; padding: 0px;">
 
-<center style='background-color: #f2f2f2;'>
-  <% flash.each do |key, value| %>
-    <%= value %>
-  <% end %>
-  <h1>
-    Movie Viewer
-  </h1>
-  <h3>
-    <%= link_to "Home", "/movies" %>  -  <%= link_to "Upload", new_movie_path %>
-  </h3>
-</center>
+		<center style='background-color: #fff;'>
+		</center>
+		<div id="header">
+			<a href="/">
+				<div id="titleName">
+					mo<font style="color: #fff;">Views</font> &nbsp-&nbsp <font id="title"><%= @title %></font><font style="margin-left: 30px;color: #08c ; text-shadow: 0 0 10px rgba(255,255,255,0.2);">Your movie has been<% flash.each do |key, value| %><%= value %><% end %></font>
+				</div>
+			</a>
+	
+			<a href="/movies/new">
+				<center>
+			 		<div id="addBtn">
+			 			<b style="position: relative; top: -2px; left: -1px;">
+			 				+
+			 			</b>
+			 		</div>
+			 	</center>
+			</a>
+		</div>
 
-<%= yield %>
-
-</body>
+		<center>
+			<div id="datas">
+				<%= yield %>
+			</div>
+		</center>
+		<div style="font-family: Georgia;position: absolute; color: #888; bottom: 2px; right: 15px; font-size: 14px;">
+			moViews 2013 &copy
+		</div>
+	</body>
 </html>

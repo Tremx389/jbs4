@@ -37,7 +37,7 @@ div#details
 		div#description
 			{
 				padding-left: 10px;
-				width: 96%;
+				width: 100%;
 				float: left;
 				font-family: Lucida Grande, Helvetica, Arial;
 				font-size: 17px;
