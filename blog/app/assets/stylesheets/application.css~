@@ -1,6 +1,22 @@
-body
-	{	
+
+a
+	{
+		color: #08c;
 	}
+		a:hover
+			{
+				color: #4bf;
+			}
+
+div#user_nav
+	{
+		float: right;
+		text-shadow: 0 0 3px rgba(255,255,255,0.3);
+		margin-right: 15px;
+		margin-top: 14px;
+		font-family: Lucida Grande, Helvetica, Arial;
+	}
+
 div#header
 	{
 	 	position: relative;

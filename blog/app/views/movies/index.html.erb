@@ -7,9 +7,9 @@
 		<% @movies.each do |movie| %>
 			<% @i+=1 %>
 			<% if @i % 2 == 0 %>
-				<div actors="<%= @relat[movie.id] %>" name="<%= movie.id %>" style="background-image: -webkit-linear-gradient(top,#585858,#3f3f3f);" class="movieList" onclick='loadVid(this)' id="<%= movie.url %>" title="<%= movie.about %>" > 
+				<div uploader="<%= @uploader[movie.id] %>" actors="<%= @relat[movie.id] %>" name="<%= movie.id %>" style="background-image: -webkit-linear-gradient(top,#585858,#3f3f3f);" class="movieList" onclick='loadVid(this)' id="<%= movie.url %>" title="<%= movie.about %>" > 
 			<% else %>
-			 	<div actors="<%= @relat[movie.id] %>" name="<%= movie.id %>" style="background-image: -webkit-linear-gradient(top,#444,#2a2a2a);" class="movieList" onclick='loadVid(this)' id="<%= movie.url %>" title="<%= movie.about %>" >
+			 	<div uploader="<%= @uploader[movie.id] %>" actors="<%= @relat[movie.id] %>" name="<%= movie.id %>" style="background-image: -webkit-linear-gradient(top,#444,#2a2a2a);" class="movieList" onclick='loadVid(this)' id="<%= movie.url %>" title="<%= movie.about %>" >
 			<% end %>
 		     <%= movie.title %>
 		   </div>
@@ -24,7 +24,7 @@
 				</a>
 			</center>
 	</div>
-  
+  	
   	<div id="details">
   		<div id="actors">
   			<a id="editHREF">
@@ -48,14 +48,28 @@
   function loadVid(video)
     {
     	document.getElementById("actorsList").innerHTML = "";
-    	var actors = video.attributes["actors"].value.split(",")
+    	
+    	var user = "<%= current_user.email[/[^@]+/]%>";
+    	var actors = video.attributes["actors"].value.split(",");
+    	var uploader = video.attributes["uploader"].value;
+    	var vid =  document.getElementById("vP");
+    	
+    	if (user != uploader)
+    		{
+    			document.getElementById("editHREF").style.display = "none";
+    		}
+    	else
+    		{
+    			document.getElementById("editHREF").style.display = "block";
+    		}
+    	
     	for (var i = 0; i < actors.length-1; i++)
     		{
     			$("#actorsList").append("<div class='actor'>"+actors[i]+"</div>");
     		}
-    		
+    	$("#actorsList").append("<div class='uploader'><b>"+uploader+"</b></div>");	
+    	
     	document.getElementById("editHREF").href = "/movies/"+video.attributes["name"].value+"/";
-    	var vid =  document.getElementById("vP");
      	document.title = "moViews - " + video.innerHTML;
       document.getElementById("title").innerHTML = video.innerHTML;
       document.getElementById("description").innerHTML = video.title;

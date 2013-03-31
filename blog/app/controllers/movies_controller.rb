@@ -1,14 +1,23 @@
 class MoviesController < ApplicationController
   def index
+  		
+  		if !user_signed_in?
+  		  redirect_to new_user_session_path, :notice => "You must Log In."
+    	end 
+    
+    
     @movies = Movie.all
     @title = "Home"
     @i = 0;
     
     
     @relat = Array.new
+    @uploader = Array.new
+    
     @movies.each do |m|
     	@first = Relationships.where(:film_id => m.id).collect(&:actor_id);
     	@relat[m.id] = ""
+    	@uploader[m.id] = m.actors;
     	
     	@first.each do |f|
     		@actor = Actor.find(f)[:name].to_s
@@ -29,7 +38,7 @@ class MoviesController < ApplicationController
   
   def create
     @par = params[:movie]
-    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url])
+    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url], :actors => current_user.email[/[^@]+/])
     @relations = @par[:rel].split
     
     if @movie.save

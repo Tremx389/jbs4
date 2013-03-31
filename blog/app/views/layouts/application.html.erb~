@@ -9,16 +9,20 @@
 	  <%= csrf_meta_tags %>
 	</head>
 	<body style="background: #f9f9f9; margin: 0px; padding: 0px;">
-
+		<% if !@title %>
+			<% @title = "Sign In/Up" %>
+		<% end %>
+		
+		
 		<center style='background-color: #fff;'>
 		</center>
 		<div id="header">
 			<a href="/">
 				<div id="titleName">
-					mo<font style="color: #fff;">Views</font> &nbsp-&nbsp <font id="title"><%= @title %></font><font style="margin-left: 30px;color: #08c ; text-shadow: 0 0 10px rgba(255,255,255,0.2);">Your movie has been<% flash.each do |key, value| %><%= value %><% end %></font>
+					mo<font style="color: #fff;">Views</font> &nbsp-&nbsp <font id="title"><%= @title %></font><font style="margin-left: 30px;color: #08c ; text-shadow: 0 0 10px rgba(255,255,255,0.2);"><% flash.each do |key, value| %><%= value %><% end %></font>
 				</div>
 			</a>
-	
+			
 			<a href="/movies/new">
 				<center>
 			 		<div id="addBtn">
@@ -28,8 +32,21 @@
 			 		</div>
 			 	</center>
 			</a>
-		</div>
 
+			<div id="user_nav">
+				<% if user_signed_in? %>
+					<font style="color: #2ae; text-shadow: 0 0 10px rgba(255,255,255,0.3)">
+						<%= current_user.email[/[^@]+/] %>
+					</font> -
+					<%= link_to "Sign Out", destroy_user_session_path, :method => :delete %>
+				<% else %>
+					<%= link_to "Sign Up", new_user_registration_path %> or <%= link_to "In", new_user_session_path %>
+				<% end %>
+			</div>
+			
+		</div>
+		
+		
 		<center>
 			<div id="datas">
 				<%= yield %>
