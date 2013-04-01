@@ -23,15 +23,17 @@
 				</div>
 			</a>
 			
-			<a href="/movies/new">
-				<center>
-			 		<div id="addBtn">
-			 			<b style="position: relative; top: -2px; left: -1px;">
-			 				+
-			 			</b>
-			 		</div>
-			 	</center>
-			</a>
+			<% if user_signed_in? %>
+				<a href="/movies/new">
+					<center>
+				 		<div id="addBtn">
+				 			<b style="position: relative; top: -2px; left: -1px;">
+				 				+
+				 			</b>
+				 		</div>
+				 	</center>
+				</a>
+			<% end %>
 
 			<div id="user_nav">
 				<% if user_signed_in? %>

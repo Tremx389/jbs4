@@ -1,9 +1,5 @@
 class MoviesController < ApplicationController
   def index
-  		
-  		if !user_signed_in?
-  		  redirect_to new_user_session_path, :notice => "You must Log In."
-    	end 
     
     
     @movies = Movie.all
@@ -17,7 +13,7 @@ class MoviesController < ApplicationController
     @movies.each do |m|
     	@first = Relationships.where(:film_id => m.id).collect(&:actor_id);
     	@relat[m.id] = ""
-    	@uploader[m.id] = m.actors;
+    	@uploader[m.id] = m.uploader;
     	
     	@first.each do |f|
     		@actor = Actor.find(f)[:name].to_s
@@ -25,6 +21,8 @@ class MoviesController < ApplicationController
     	end
     end
   end
+  1
+  
   
   def new
   	 @i = 0
@@ -38,7 +36,7 @@ class MoviesController < ApplicationController
   
   def create
     @par = params[:movie]
-    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url], :actors => current_user.email[/[^@]+/])
+    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url], :uploader => current_user.id)
     @relations = @par[:rel].split
     
     if @movie.save
@@ -54,6 +52,7 @@ class MoviesController < ApplicationController
   end
 
   def show
+  	 permisison_detection
   	@i = 0;
   	 @title = "Edit("+params[:id]+")"
     
@@ -62,16 +61,19 @@ class MoviesController < ApplicationController
     
     @relats = Relationships.where(:film_id => params[:id]).collect(&:actor_id);
     
-    if @movie.actors != nil
-      @movActors = @movie.actors.split
-    else
-      @movActors = ""
-    end
   end
 
+	def permisison_detection
+     if Movie.find(params[:id]).uploader != current_user.id
+      	redirect_to movies_path, :notice => "You don't have Permission."
+     end
+  	end
+  	
   def update
+  	permisison_detection
     @mov = Movie.find(params[:id])
     @par = params[:movie]
+    
     
     @relations = @par[:rel].split
     

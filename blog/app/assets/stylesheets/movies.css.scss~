@@ -35,7 +35,7 @@ div#details
 			}
 		div.uploader
 			{
-				background-image: -webkit-linear-gradient(top,#080,#0a0);
+				background-image: -webkit-linear-gradient(top,#080,#0b0);
 				box-shadow: 0 0 4px rgba(0,0,0,0.4);
 				text-shadow: 0 0 4px rgba(0,0,0,0.8);
 				float: left;

@@ -23,19 +23,21 @@
 				</div>
 			</a>
 			
-			<a href="/movies/new">
-				<center>
-			 		<div id="addBtn">
-			 			<b style="position: relative; top: -2px; left: -1px;">
-			 				+
-			 			</b>
-			 		</div>
-			 	</center>
-			</a>
+			<% if user_signed_in? %>
+				<a href="/movies/new">
+					<center>
+				 		<div id="addBtn">
+				 			<b style="position: relative; top: -2px; left: -1px;">
+				 				+
+				 			</b>
+				 		</div>
+				 	</center>
+				</a>
+			<% end %>
 
 			<div id="user_nav">
 				<% if user_signed_in? %>
-					<font style="color: #2ae; text-shadow: 0 0 10px rgba(255,255,255,0.3)">
+					<font style="color: #2ae; text-shadow: 0 0 10px rgba(255,255,255,0.4)">
 						<%= current_user.email[/[^@]+/] %>
 					</font> -
 					<%= link_to "Sign Out", destroy_user_session_path, :method => :delete %>

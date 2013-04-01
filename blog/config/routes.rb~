@@ -1,8 +1,10 @@
 Blog::Application.routes.draw do
   
+  devise_for :users
+
   resources :movies
   resources :actors
 
   match "/" => "movies#index"
-  match '/actors/:id' => 'movies#index'
+  root :to => "movies#index"
 end

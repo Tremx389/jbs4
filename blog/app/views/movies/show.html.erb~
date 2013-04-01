@@ -65,7 +65,7 @@
   </table>
 </center>
 <br>
-      <center style="display: inline; ">
+      <center>
       	<div style="width: 200px;">
    	 		<input id="rel" name="movie[rel]" style="display: none" />
    	 		<input name="commit" type="submit" value="Update Movie" style="float: left;">

@@ -42,14 +42,12 @@
   
   
   
-  
-  
 <script>
   function loadVid(video)
     {
     	document.getElementById("actorsList").innerHTML = "";
     	
-    	var user = "<%= current_user.email[/[^@]+/]%>";
+    	var user = "<%= current_user.id %>";
     	var actors = video.attributes["actors"].value.split(",");
     	var uploader = video.attributes["uploader"].value;
     	var vid =  document.getElementById("vP");
@@ -67,7 +65,6 @@
     		{
     			$("#actorsList").append("<div class='actor'>"+actors[i]+"</div>");
     		}
-    	$("#actorsList").append("<div class='uploader'><b>"+uploader+"</b></div>");	
     	
     	document.getElementById("editHREF").href = "/movies/"+video.attributes["name"].value+"/";
      	document.title = "moViews - " + video.innerHTML;
