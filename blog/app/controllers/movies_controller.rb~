@@ -11,7 +11,8 @@ class MoviesController < ApplicationController
     @uploader = Array.new
     
     @movies.each do |m|
-    	@first = Relationships.where(:film_id => m.id).collect(&:actor_id);
+    	@first = Movie.find(m.id).actors.collect(&:id)
+    	
     	@relat[m.id] = ""
     	@uploader[m.id] = m.uploader;
     	
@@ -27,7 +28,7 @@ class MoviesController < ApplicationController
   def new
   	 @i = 0
     @movie = Movie.new
-    @rel = Relationships.new
+    @rel = Categorization.new
     
     @actors = Actor.all
     
@@ -36,14 +37,12 @@ class MoviesController < ApplicationController
   
   def create
     @par = params[:movie]
-    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url], :actors => current_user.email[/[^@]+/])
+    @movie = Movie.new(:title => @par[:title], :about => @par[:about], :url => @par[:url], :uploader => current_user.id)
     @relations = @par[:rel].split
     
     if @movie.save
-    	@relations.each do |relation|
-    		@addRel = Relationships.new(:actor_id => relation ,:film_id => @movie.id)
-    		@addRel.save
-    	end
+    	Movie.find(@movie.id).actors << @relations.map{|id| Actor.find(id)}
+    	
      	redirect_to movies_path, :notice => "Saved!"
      	
     else
@@ -53,13 +52,14 @@ class MoviesController < ApplicationController
 
   def show
   	 permisison_detection
-  	@i = 0;
+  	 
+  	 @i = 0;
   	 @title = "Edit("+params[:id]+")"
     
     @movie = Movie.find(params[:id])
     @actors = Actor.all
     
-    @relats = Relationships.where(:film_id => params[:id]).collect(&:actor_id);
+    @relats = @movie.actors.collect(&:id);
     
   end
 
@@ -69,23 +69,18 @@ class MoviesController < ApplicationController
      end
   	end
   	
+  	
   def update
   	permisison_detection
-    @mov = Movie.find(params[:id])
-    @par = params[:movie]
+  	
+    @m = Movie.find(params[:id])
+    @p = params[:movie]
+    @cb = @p[:rel].split 			#all CheckBox
     
+    @m.actors.destroy_all
+    @m.actors << @cb.map{|id| Actor.find(id)}
     
-    @relations = @par[:rel].split
-    
-    @destroy = Relationships.where(:film_id => params[:id]).destroy_all
-    
-    @relations.each do |relation|
-    		@addRel = Relationships.new(:actor_id => relation ,:film_id => params[:id])
-    		@addRel.save
-    	end
-    
-    
-    if @mov.update_attributes(:about => @par[:about], :title => @par[:title], :url => @par[:url])
+    if @m.update_attributes(:about => @p[:about], :title => @p[:title], :url => @p[:url])
       redirect_to movies_path, :notice => "Updated!"
     else
       render "show"
@@ -93,9 +88,9 @@ class MoviesController < ApplicationController
   end
 
   def destroy
-    @movie = Movie.find(params[:id])
-    @movie.destroy
-    @destroy = Relationships.where(:film_id => params[:id]).destroy_all
+    @m = Movie.find(params[:id])
+    @m.destroy
+    @m.actors.destroy_all
     
     redirect_to movies_path, :notice => "Deleted"
   end

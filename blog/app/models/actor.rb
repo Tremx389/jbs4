@@ -1,4 +1,6 @@
-class Actor < ActiveRecord::Base  # Class name should be Singular
+class Actor < ActiveRecord::Base
   attr_accessible :birth, :name
-  has_many :relationship
+  
+  has_many :categorizations
+  has_many :movies, :through => :categorizations
 end

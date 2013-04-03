@@ -67,7 +67,7 @@
 <br>
       <center>
       	<div style="width: 200px;">
-   	 		<input id="rel" name="movie[rel]" style="display: none" />
+   	 		<input id="rel" name="movie[rel]" style="display: block" />
    	 		<input name="commit" type="submit" value="Update Movie" style="float: left;">
      		  	
 <% end %>
@@ -78,6 +78,7 @@
       </center>
 
 <script>
+  detectActors();
   function detectActors()
     {
 		var inputs = document.getElementsByTagName("input");
